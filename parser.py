@@ -48,5 +48,9 @@ element = chrome_driver.find_element(By.XPATH, "//*[@id='checkpointsTable']/tbod
 value_queue = element.text.split()[0]
 write_to_database(2, value_queue, value_timestamp)
 
+element = chrome_driver.find_element(By.XPATH, "//*[@id='checkpointsTable']/tbody/tr[6]/td[2]")
+value_queue = element.text.split()[0]
+write_to_database(4, value_queue, value_timestamp)
+
 chrome_driver.close()
 chrome_driver.quit()
