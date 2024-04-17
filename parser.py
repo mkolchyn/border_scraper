@@ -6,11 +6,11 @@ from selenium.webdriver.chrome.options import Options
 import psycopg2
 from psycopg2 import sql
 
-# Set up Chrome options
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run in headless mode, i.e., without opening a browser window
 
-chrome_driver_path = "D:\\EPAM-Data_Engineering\\Training\\LAB\\LAB_2_DWH ETL PostgreSQL\\Part_5_DQE\\Topic_12\\hw\\chromedriver\\chromedriver.exe"
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+
+chrome_driver_path = "/home/kolchin/border_scraper/chromedriver-linux64/chromedriver"
 chrome_service = Service(executable_path=chrome_driver_path)
 chrome_driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
