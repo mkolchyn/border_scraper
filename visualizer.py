@@ -37,7 +37,7 @@ for interval, query in intervals.items():
     plt.legend()
     plt.grid()
     plt.tight_layout()
-    plt.savefig(f'{os.getenv("WORKING_DIR_PATH")}/queue_length_visual_{interval.replace(" ", "_")}.png')
+    plt.savefig(f'{os.getenv("WORKING_DIR_PATH")}/www/queue_length_visual_{interval.replace(" ", "_")}.png')
     plt.close()
 
 conn.close()
