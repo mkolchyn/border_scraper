@@ -1,7 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from scraper import get_database_connection
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env file
+load_dotenv()
 
 intervals = {
     "3 hours": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('hour', current_timestamp) - interval '3 hour';",
@@ -33,7 +37,7 @@ for interval, query in intervals.items():
     plt.legend()
     plt.grid()
     plt.tight_layout()
-    plt.savefig(f'./border_scraper/queue_length_visual_{interval.replace(" ", "_")}.png')
+    plt.savefig(f'{os.getenv("WORKING_DIR_PATH")}/queue_length_visual_{interval.replace(" ", "_")}.png')
     plt.close()
 
 conn.close()
