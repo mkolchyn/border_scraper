@@ -11,7 +11,7 @@ intervals = {
     "3 hours": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('hour', current_timestamp) - interval '3 hour';",
     "24 hours": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('hour', current_timestamp) - interval '24 hour';",
     "1 week": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('day', current_timestamp) - interval '6 day';",
-    "1 month": "select * from visual where DATE_TRUNC('month', insert_dt) >= DATE_TRUNC('month', current_timestamp) - interval '1 day' + interval '1 day';"
+    "1 month": "select * from visual where insert_dt >= DATE_TRUNC('day', current_timestamp) - interval '30 day';"
     }
 
 conn = get_database_connection()
@@ -26,7 +26,7 @@ for interval, query in intervals.items():
     # Sort the index to ensure correct time order
     pivot_df = pivot_df.sort_index()
     # Step 2: Plotting the Data
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(20, 10))
     for area in pivot_df.columns:
         plt.plot(pivot_df.index, pivot_df[area], marker='o', label=area)
 
