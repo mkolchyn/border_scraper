@@ -34,9 +34,6 @@ for interval, query in intervals.items():
         if date.weekday() in [5, 6]:
             plt.axvspan(pivot_df.index[i], pivot_df.index[i], color='#FFC9CD', alpha=0.5)
 
-
-    plt.xlabel('Time', fontsize=30)
-    plt.ylabel('Queue Length', fontsize=30)
     plt.title(f'Queue Length Over Time by Buffer Zone - {interval}', fontsize=30)
     plt.xticks(rotation=45, fontsize=20)
     plt.yticks(fontsize=20)
