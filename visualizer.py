@@ -8,10 +8,10 @@ import os
 load_dotenv()
 
 intervals = {
-    "3 hours": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('hour', current_timestamp) - interval '3 hour';",
-    "24 hours": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('hour', current_timestamp) - interval '24 hour';",
-    "1 week": "select * from visual where DATE_TRUNC('hour', insert_dt) >= DATE_TRUNC('day', current_timestamp) - interval '6 day';",
-    "1 month": "select * from visual where insert_dt >= DATE_TRUNC('day', current_timestamp) - interval '30 day';"
+    "3 hours": "select * from vsl_lt_3_hrs;",
+    "24 hours": "select * from vsl_lt_24_hrs;",
+    "1 week": "select * from vsl_lt_1_wk;",
+    "1 month": "select * from vsl_lt_1_mnth;"
     }
 
 conn = get_database_connection()
@@ -22,7 +22,7 @@ for interval, query in intervals.items():
     # Convert insert_dt to datetime
     df['insert_dt'] = pd.to_datetime(df['insert_dt'])
     # Pivot the DataFrame
-    pivot_df = df.pivot(index='insert_dt', columns='waiting_area_name', values='queue')
+    pivot_df = df.pivot(index='insert_dt', columns='buffer_zone_name', values='vehicle_count')
     # Sort the index to ensure correct time order
     pivot_df = pivot_df.sort_index()
     # Step 2: Plotting the Data
