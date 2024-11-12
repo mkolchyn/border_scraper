@@ -26,10 +26,10 @@ def get_database_connection():
     )
 
 
-def write_to_database(cursor, waiting_area, value_queue, value_timestamp):
+def write_to_database(cursor, buffer_zone_id, vehicle_count, value_timestamp):
     """Insert data into the database."""
-    insert_statement = sql.SQL("INSERT INTO queue (waiting_area, queue, date_src) VALUES (%s, %s, %s)")
-    data = (waiting_area, value_queue, value_timestamp)
+    insert_statement = sql.SQL("INSERT INTO queue_length (buffer_zone, vehicle_count, date_src) VALUES (%s, %s, %s)")
+    data = (buffer_zone_id, vehicle_count, value_timestamp)
     cursor.execute(insert_statement, data)
 
 
@@ -68,9 +68,9 @@ def main():
         cursor = connection.cursor()
 
         # Iterate through the xpaths and write to the database
-        for waiting_area, xpath in xpaths.items():
-            value_queue = get_element_text(chrome_driver, xpath)
-            write_to_database(cursor, waiting_area, value_queue, value_timestamp)
+        for buffer_zone_id, xpath in xpaths.items():
+            vehicle_count = get_element_text(chrome_driver, xpath)
+            write_to_database(cursor, buffer_zone_id, vehicle_count, value_timestamp)
 
         connection.commit()  # Commit once after all inserts
         cursor.close()
