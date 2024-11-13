@@ -1,85 +1,46 @@
-import os
-from dotenv import load_dotenv
-from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import psycopg2
-from psycopg2 import sql
-
-
-# Load environment variables from .env file
-load_dotenv()
-
-
-def get_database_connection():
-    """Create a database connection using credentials from a .env file."""
-    return psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT")
-    )
-
-
-def write_to_database(cursor, buffer_zone_id, vehicle_count, value_timestamp):
-    """Insert data into the database."""
-    insert_statement = sql.SQL("INSERT INTO queue_length (buffer_zone, vehicle_count, date_src) VALUES (%s, %s, %s)")
-    data = (buffer_zone_id, vehicle_count, value_timestamp)
-    cursor.execute(insert_statement, data)
-
-
-def get_element_text(driver, xpath):
-    """Retrieve the text of a web element identified by its XPATH."""
-    element = WebDriverWait(driver, 300).until(
-        EC.presence_of_element_located((By.XPATH, xpath))
-    )
-    return element.text
+from functions import get_database_connection, fetch_data_from_api, insert_data_into_qla, insert_data_into_bzs
 
 
 def main():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
-    chrome_service = Service(executable_path=chrome_driver_path)
-    chrome_driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-
+    """Main function to orchestrate data fetching and insertion."""
+    
+    '''Populate Queue Length table'''
     try:
-        chrome_driver.get(url="https://mon.declarant.by/zone")
-        # Retrieve date information
-        value_date = get_element_text(chrome_driver, "//html/body/app-root/div/div/app-zone-list/div/div/div")
-        value_timestamp = datetime.strptime(value_date, "По состоянию на: %d.%m.%Y | %H:%M")
+        url = "https://belarusborder.by/info/checkpoint?token=bts47d5f-6420-4f74-8f78-42e8e4370cc4"
 
-        # Define the waiting area xpaths
-        xpaths = {
-            1: "/html/body/app-root/div/div/app-zone-list/div/div/app-customs-card/div/app-customs-table/div/table/tbody/tr[1]/td[1]",
-            2: "/html/body/app-root/div/div/app-zone-list/div/div/app-customs-card/div/app-customs-table/div/table/tbody/tr[3]/td[1]",
-            3: "/html/body/app-root/div/div/app-zone-list/div/div/app-customs-card/div/app-customs-table/div/table/tbody/tr[5]/td[1]",
-            4: "/html/body/app-root/div/div/app-zone-list/div/div/app-customs-card/div/app-customs-table/div/table/tbody/tr[4]/td[1]",
+        data = fetch_data_from_api(url)
+
+        buffer_zone_map = {
+            "53d94097-2b34-11ec-8467-ac1f6bf889c0": 1,
+            "a9173a85-3fc0-424c-84f0-defa632481e4": 2,
+            "b60677d4-8a00-4f93-a781-e129e1692a03": 3,
+            "ffe81c11-00d6-11e8-a967-b0dd44bde851": 4
         }
 
-        # Open a single database connection
-        connection = get_database_connection()
-        cursor = connection.cursor()
-
-        # Iterate through the xpaths and write to the database
-        for buffer_zone_id, xpath in xpaths.items():
-            vehicle_count = get_element_text(chrome_driver, xpath)
-            write_to_database(cursor, buffer_zone_id, vehicle_count, value_timestamp)
-
-        connection.commit()  # Commit once after all inserts
-        cursor.close()
-        connection.close()
+        # Loop through all data and insert based on the mapped zone
+        for cp in data['result']:
+            if cp['id'] in buffer_zone_map:
+                insert_data_into_qla(buffer_zone_map[cp['id']], cp)
+                print(f"Total Data for buffer_zone_id {buffer_zone_map[cp['id']]} inserted successfully.")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        chrome_driver.quit()
+        print(f"Error: {e}")
+
+    '''Populate Buffer Zone Stats table'''
+    try:
+        scope = {
+            1: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=53d94097-2b34-11ec-8467-ac1f6bf889c0",
+            2: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=a9173a85-3fc0-424c-84f0-defa632481e4",
+            3: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=b60677d4-8a00-4f93-a781-e129e1692a03",
+            4: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=ffe81c11-00d6-11e8-a967-b0dd44bde851",
+        }
+
+        for buffer_zone_id, url in scope.items():
+            data = fetch_data_from_api(url)
+            insert_data_into_bzs(buffer_zone_id, data)
+            print(f"Data for buffer_zone_id {buffer_zone_id} inserted successfully.")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":

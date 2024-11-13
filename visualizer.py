@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from scraper import get_database_connection
+from functions import get_database_connection
 from dotenv import load_dotenv
 import os
 
@@ -22,7 +22,7 @@ for interval, query in intervals.items():
     # Convert insert_dt to datetime
     df['insert_dt'] = pd.to_datetime(df['insert_dt'])
     # Pivot the DataFrame
-    pivot_df = df.pivot(index='insert_dt', columns='buffer_zone_name', values='vehicle_count')
+    pivot_df = df.pivot(index='insert_dt', columns='buffer_zone_name', values='count_car')
     # Sort the index to ensure correct time order
     pivot_df = pivot_df.sort_index()
     # Step 2: Plotting the Data

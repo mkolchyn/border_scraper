@@ -1,11 +1,11 @@
-import requests
-import psycopg2
 import os
-import psycopg2
 from dotenv import load_dotenv
+import psycopg2
+import requests
 
-# Load environment variables from a .env file
+# Load environment variables from .env file
 load_dotenv()
+
 
 def get_database_connection():
     """Create a database connection using credentials from a .env file."""
@@ -17,9 +17,9 @@ def get_database_connection():
         port=os.getenv("DB_PORT")
     )
 
-def fetch_data_from_api(checkpointId):
+
+def fetch_data_from_api(url):
     """Fetch JSON data from the provided API."""
-    url = f'https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId={checkpointId}'
     response = requests.get(url)
     
     if response.status_code == 200:
@@ -27,7 +27,38 @@ def fetch_data_from_api(checkpointId):
     else:
         raise Exception(f"Failed to fetch data: {response.status_code}, {response.text}")
 
-def insert_data_into_db(buffer_zone_id, data):
+
+def insert_data_into_qla(buffer_zone_id, data):
+    """Insert fetched data into the border_statistics table."""
+    query = """
+    INSERT INTO queue_length_all (
+    	buffer_zone_id, count_all, count_car, count_truck, count_bus, count_motorcycle, count_live_queue, count_bookings,
+        count_priority, count_passed_scc
+    ) VALUES (
+    %(buffer_zone_id)s, %(countAll)s, %(countCar)s, %(countTruck)s, %(countBus)s, %(countMotorcycle)s, %(countLiveQueue)s,
+    %(countBookings)s, %(countPriority)s, %(countPassedSCC)s
+    )
+    """
+    
+    # Add buffer_zone_id to the data dictionary
+    data['buffer_zone_id'] = buffer_zone_id
+    
+    conn = None
+    try:
+        conn = get_database_connection()
+        with conn.cursor() as cursor:
+            cursor.execute(query, data)
+        conn.commit()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print(f"Database error: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+
+def insert_data_into_bzs(buffer_zone_id, data):
     """Insert fetched data into the border_statistics table."""
     query = """
     INSERT INTO buffer_zone_statistics (
@@ -55,23 +86,3 @@ def insert_data_into_db(buffer_zone_id, data):
     finally:
         if conn:
             conn.close()
-
-def main():
-    """Main function to orchestrate data fetching and insertion."""
-    try:
-        scope = {
-            1: "53d94097-2b34-11ec-8467-ac1f6bf889c0",
-            2: "a9173a85-3fc0-424c-84f0-defa632481e4",
-            3: "b60677d4-8a00-4f93-a781-e129e1692a03",
-            4: "ffe81c11-00d6-11e8-a967-b0dd44bde851",
-        }
-
-        for buffer_zone_id, checkpointId in scope.items():
-            data = fetch_data_from_api(checkpointId)  # Pass only checkpointId
-            insert_data_into_db(buffer_zone_id, data)  # Pass buffer_zone_id and data
-            print(f"Data for buffer_zone_id {buffer_zone_id} inserted successfully.")
-    except Exception as e:
-        print(f"Error: {e}")
-
-if __name__ == "__main__":
-    main()
