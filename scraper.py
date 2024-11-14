@@ -63,15 +63,14 @@ def main():
 
     '''Populate Car Live Queue table'''
     try:
-        query = '''
+        query = """
         INSERT INTO car_live_queue (
             buffer_zone_id, regnum, status, order_id, type_queue, registration_date, changed_date
         ) VALUES (
             %(buffer_zone_id)s, %(regnum)s, %(status)s, %(order_id)s, %(type_queue)s, %(registration_date)s, %(changed_date)s
         )
         ON CONFLICT (regnum, registration_date) DO NOTHING
-
-        '''
+        """
 
         buffer_zones = {
         1: "53d94097-2b34-11ec-8467-ac1f6bf889c0",
@@ -87,7 +86,7 @@ def main():
             # Iterate over the 'carLiveQueue' and filter by status
             cars_with_status_3 = [car for car in data.get("carLiveQueue", []) if car.get("status") == 3]
 
-            # Print the filtered cars
+
             for car in cars_with_status_3:
                 car["registration_date"] = convert_date(car["registration_date"])
                 car["changed_date"] = convert_date(car["changed_date"])
@@ -95,6 +94,7 @@ def main():
                 print(f"Cars for buffer_zone_id {buffer_zone_id} handled somehow:).")
     except Exception as e:
         print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     main()
