@@ -34,7 +34,7 @@ AS SELECT qla.insert_dt,
   WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
   ORDER BY qla.insert_dt;
 
-  CREATE OR REPLACE VIEW vsl_all_car_origin_ratio AS 
+CREATE OR REPLACE VIEW vsl_all_car_origin_ratio AS 
 WITH car_origin_by_country AS (
     SELECT 
         buffer_zone_name,

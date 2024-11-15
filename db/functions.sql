@@ -1,13 +1,21 @@
 CREATE OR REPLACE FUNCTION get_queue_speed(buffer_zone_id_param INTEGER)
 RETURNS TABLE (
-    queue_speed INTEGER
+    queue_speed float
 ) AS $$
 BEGIN
     RETURN QUERY 
     WITH time_diff_count_ini AS (
         SELECT 
             regnum,
-            ROUND((EXTRACT(hour FROM (changed_date - registration_date)) * 60 + EXTRACT(minute FROM (changed_date - registration_date))) / 60, 2) AS time_diff,
+			changed_date,
+			registration_date,
+		CASE 
+			WHEN extract(day from changed_date) > extract(day from registration_date) then
+				round (((60 - extract(minute from registration_date)) + (24 - (extract(hour from registration_date)+1))*60 +
+				extract(hour from changed_date)*60 + extract(minute from changed_date))/60,2)
+			ELSE 
+				ROUND((EXTRACT(hour FROM (changed_date - registration_date)) * 60 + EXTRACT(minute FROM (changed_date - registration_date))) / 60, 2)
+		END AS time_diff,
             count_car
         FROM car_live_queue clq 
         JOIN queue_length_all qla ON 
@@ -18,7 +26,7 @@ BEGIN
     ) 
     SELECT 
         CASE 
-            WHEN time_diff >= 1 THEN CAST(ROUND(count_car / time_diff) AS INTEGER)
+            WHEN time_diff >= 1 THEN CAST(ROUND(count_car / time_diff,2) AS float)
         END AS queue_speed
     FROM time_diff_count_ini
     LIMIT 10;
