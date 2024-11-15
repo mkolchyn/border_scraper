@@ -2,28 +2,31 @@ import os
 from dotenv import load_dotenv
 import requests
 from datetime import datetime
+import psycopg2
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.sql import text
 
 # Load environment variables from .env file
 load_dotenv()
 
 
+#def get_database_connection():
+#    """Create a database connection using SQLAlchemy and credentials from a .env file."""
+#    db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+#    engine = create_engine(db_url)
+#    return engine.connect()
+
+
 def get_database_connection():
-    """Create a database connection using SQLAlchemy and credentials from a .env file."""
-    db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    engine = create_engine(db_url)
-    return engine.connect()
-
-
-# def get_database_connection():
-#     """Create a database connection using credentials from a .env file."""
-#     return psycopg2.connect(
-#         dbname=os.getenv("DB_NAME"),
-#         user=os.getenv("DB_USER"),
-#         password=os.getenv("DB_PASSWORD"),
-#         host=os.getenv("DB_HOST"),
-#         port=os.getenv("DB_PORT")
-#     )
+    """Create a database connection using credentials from a .env file."""
+    return psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
 
 
 def fetch_data_from_api(url):
