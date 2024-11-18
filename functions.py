@@ -3,19 +3,12 @@ from dotenv import load_dotenv
 import requests
 from datetime import datetime
 import psycopg2
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.sql import text
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Load environment variables from .env file
 load_dotenv()
-
-
-#def get_database_connection():
-#    """Create a database connection using SQLAlchemy and credentials from a .env file."""
-#    db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-#    engine = create_engine(db_url)
-#    return engine.connect()
 
 
 def get_database_connection():
@@ -62,3 +55,43 @@ def insert_data_into_db(buffer_zone_id, query, data):
 
 def convert_date(date_str):
     return datetime.strptime(date_str, "%H:%M:%S %d.%m.%Y")
+
+
+def create_visual (intervals, cln_index, cln_columns, cln_values):
+    
+    conn = get_database_connection()
+
+    for interval, query in intervals.items():
+        
+        df = pd.read_sql_query(query, conn)
+        df[cln_index] = pd.to_datetime(df[cln_index])
+        pivot_df = df.pivot(index=cln_index, columns=cln_columns, values=cln_values)
+        pivot_df = pivot_df.sort_index()
+        
+        plt.figure(figsize=(20, 10))
+        sns.lineplot(data=pivot_df, dashes=False, markers=False)
+        
+        # Highlight days
+        for i, date in enumerate(pivot_df.index):
+            if date.weekday() in [5, 6]:  # Saturday and Sunday
+                plt.axvspan(date, date, color='#FFC9CD', alpha=0.5)
+            elif date.weekday() == 2:  # Wednesday
+                plt.axvspan(date, date, color='#9AEBFF', alpha=0.5)   
+
+        # Annotate values on the plot
+        for line in pivot_df.columns:
+            for x, y in zip(pivot_df.index, pivot_df[line]):
+                if not pd.isna(y):
+                    plt.text(x, y, f'{y:.2f}', color='black', fontsize=20, ha='center', va='bottom')
+
+        plt.title(f'Queue Length Over Time by Buffer Zone - {interval}', fontsize=30)
+        plt.xticks(rotation=45, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.legend(fontsize=20)
+        plt.grid()
+        plt.tight_layout()
+        
+        plt.savefig(f'{os.getenv("WORKING_DIR_PATH")}/www/queue_length_visual_{interval.replace(" ", "_")}.png')
+        plt.close()
+
+    conn.close()

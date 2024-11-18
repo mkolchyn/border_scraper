@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from functions import get_database_connection
+from functions import get_database_connection, create_visual
 from dotenv import load_dotenv
 import os
 
@@ -45,3 +45,11 @@ for interval, query in intervals.items():
     plt.close()
 
 conn.close()
+
+
+
+intervals = {
+    "car_origin_ratio":"select * from vsl_all_car_origin_ratio vacor order by insert_dt;"
+}
+
+create_visual(intervals, 'insert_dt', 'buffer_zone_name', 'ratio_BY_to_other')

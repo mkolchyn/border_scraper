@@ -79,7 +79,7 @@ SELECT
     r.buffer_zone_name,
     r.insert_dt,
     CASE 
-        WHEN (r.by_count + r.other_count) > 0 THEN CONCAT(ROUND(r.by_count / (r.by_count + r.other_count) * 100, 2), '%')
-        ELSE '0%' 
+        WHEN (r.by_count + r.other_count) > 0 THEN ROUND(r.by_count / (r.by_count + r.other_count) * 100, 2)
+        ELSE 0 
     END AS "ratio_BY_to_other"
 FROM ratios r;
