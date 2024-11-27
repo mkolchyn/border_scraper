@@ -1,5 +1,8 @@
 # BY to LT Border Queue Monitoring System
 
+Hosted
+http://ec2-13-60-42-71.eu-north-1.compute.amazonaws.com/
+
 ## Overview
 
 This project provides a web-based tool for visualizing historical queue lengths at border crossing points from Belarus to Lithuania. The queue data is sourced from [declarant.by](https://mon.declarant.by/zone), which reflects the number of vehicles in buffer zones over different time periods.
