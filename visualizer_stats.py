@@ -9,16 +9,16 @@ import os
 load_dotenv()
 
 intervals = {
-    "car_last_hour": "select buffer_zone_name, car_last_hour, insert_dt from buffer_zone_statistics bzs join buffer_zone bz on bz.buffer_zone_id = bzs.buffer_zone_id where bz.buffer_zone_id in (1,3);",
-    "car_last_day": "select buffer_zone_name, car_last_day, insert_dt from buffer_zone_statistics bzs join buffer_zone bz on bz.buffer_zone_id = bzs.buffer_zone_id where bz.buffer_zone_id in (1,3);"
+    "Cars per Hour": "select bz.buffer_zone_name, count(row_id) as cars_per_hour, date_trunc('hour', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '1 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;",
+    "Cars per Day": "select bz.buffer_zone_name, count(row_id) as cars_per_day, date_trunc('day', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '7 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;"
     }
 
 conn = get_database_connection()
 
 for interval, query in intervals.items():
     df = pd.read_sql_query(query, conn)
-    df['insert_dt'] = pd.to_datetime(df['insert_dt'])
-    pivot_df = df.pivot(index='insert_dt', columns='buffer_zone_name', values=interval)
+    df['dt'] = pd.to_datetime(df['dt'])
+    pivot_df = df.pivot(index='dt', columns='buffer_zone_name', values=interval)
     pivot_df = pivot_df.sort_index()
 
     plt.figure(figsize=(20, 10))
@@ -31,7 +31,7 @@ for interval, query in intervals.items():
         elif date.weekday() == 2:  # Wednesday
             plt.axvspan(date, date, color='#9AEBFF', alpha=0.5)   
 
-    plt.title(f'Queue Length Over Time by Buffer Zone - {interval}', fontsize=30)
+    plt.title(f'The number of cars that passed through the Buffer Zone - {interval}', fontsize=30)
     plt.xticks(rotation=45, fontsize=20)
     plt.yticks(fontsize=20)
     plt.legend(fontsize=30, markerscale=1.5)
