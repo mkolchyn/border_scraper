@@ -9,8 +9,8 @@ import os
 load_dotenv()
 
 intervals = {
-    "Cars per Hour": "select bz.buffer_zone_name, count(row_id) as cars_per_hour, date_trunc('hour', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '1 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;",
-    "Cars per Day": "select bz.buffer_zone_name, count(row_id) as cars_per_day, date_trunc('day', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '7 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;"
+    "cars_per_hour": "select bz.buffer_zone_name, count(row_id) as cars_per_hour, date_trunc('hour', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '1 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;",
+    "cars_per_day": "select bz.buffer_zone_name, count(row_id) as cars_per_day, date_trunc('day', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '7 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;"
     }
 
 conn = get_database_connection()
