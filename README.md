@@ -1,7 +1,7 @@
 # BY to LT Border Queue Monitoring System
 
 Hosted
-http://ec2-13-60-42-71.eu-north-1.compute.amazonaws.com/
+[http://ec2-13-60-42-71.eu-north-1.compute.amazonaws.com/](http://ec2-13-60-196-116.eu-north-1.compute.amazonaws.com/)
 
 ## Overview
 
