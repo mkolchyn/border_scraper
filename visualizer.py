@@ -26,6 +26,10 @@ for interval, query in intervals.items():
     
     plt.figure(figsize=(20, 10))
     sns.lineplot(data=pivot_df, dashes=False, markers=False)
+
+    # Hide axis names
+    plt.xlabel("")
+    plt.ylabel("")
     
     # Highlight days
     for i, date in enumerate(pivot_df.index):

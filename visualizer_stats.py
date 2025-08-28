@@ -9,20 +9,27 @@ import os
 load_dotenv()
 
 intervals = {
-    "cars_per_hour": "select bz.buffer_zone_name, count(row_id) as cars_per_hour, date_trunc('hour', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '1 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;",
-    "cars_per_day": "select bz.buffer_zone_name, count(row_id) as cars_per_day, date_trunc('day', changed_date) as dt from car_live_queue clq join buffer_zone bz on bz.buffer_zone_id = clq.buffer_zone_id where changed_date >= NOW() - INTERVAL '7 day' and bz.buffer_zone_id in (1,3) group by bz.buffer_zone_name, clq.buffer_zone_id, dt order by clq.buffer_zone_id, dt;"
+    "cars_per_hour": "select * from cars_per_hour_last_day;",
+    "cars_per_day": "select * from cars_per_day_last_7_days;"
     }
 
 conn = get_database_connection()
 
 for interval, query in intervals.items():
     df = pd.read_sql_query(query, conn)
-    df['dt'] = pd.to_datetime(df['dt'])
+    df['dt'] = pd.to_datetime(df['dt'], utc=True).dt.tz_convert('Europe/Minsk')
     pivot_df = df.pivot(index='dt', columns='buffer_zone_name', values=interval)
     pivot_df = pivot_df.sort_index()
 
     plt.figure(figsize=(20, 10))
     sns.lineplot(data=pivot_df, dashes=False, markers=False)
+
+    # Always start Y-axis at 0
+    plt.ylim(bottom=0)
+
+    # Hide axis names
+    plt.xlabel("")
+    plt.ylabel("")
 
     # Highlight days
     for i, date in enumerate(pivot_df.index):

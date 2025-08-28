@@ -83,3 +83,69 @@ SELECT
         ELSE 0 
     END AS "ratio_BY_to_other"
 FROM ratios r;
+
+CREATE OR REPLACE VIEW cars_per_day_last_7_days AS
+SELECT
+    bz.buffer_zone_name,
+    COUNT(row_id) AS cars_per_day,
+    DATE_TRUNC('day', changed_date) AS dt
+FROM
+    car_live_queue clq
+JOIN
+    buffer_zone bz
+    ON bz.buffer_zone_id = clq.buffer_zone_id
+WHERE
+    changed_date >= DATE_TRUNC('day', NOW() - INTERVAL '7 day')
+    AND bz.buffer_zone_id IN (1, 3)
+GROUP BY
+    bz.buffer_zone_name,
+    clq.buffer_zone_id,
+    dt
+ORDER BY
+    clq.buffer_zone_id,
+    dt;
+
+CREATE OR REPLACE VIEW cars_per_hour_last_day AS
+WITH hours AS (
+    SELECT generate_series(
+        date_trunc('hour', NOW() - INTERVAL '1 day'),
+        date_trunc('hour', NOW()),
+        INTERVAL '1 hour'
+    ) AS dt
+),
+agg AS (
+    SELECT 
+        bz.buffer_zone_name, 
+        COUNT(row_id) AS cars_per_hour, 
+        DATE_TRUNC('hour', changed_date) AS dt
+    FROM 
+        car_live_queue clq
+    JOIN 
+        buffer_zone bz 
+        ON bz.buffer_zone_id = clq.buffer_zone_id
+    WHERE 
+        changed_date >= NOW() - INTERVAL '1 day'
+        AND bz.buffer_zone_id IN (1, 3)
+    GROUP BY 
+        bz.buffer_zone_name, 
+        clq.buffer_zone_id, 
+        dt
+)
+SELECT 
+    bz.buffer_zone_name,
+    h.dt,
+    COALESCE(a.cars_per_hour, 0) AS cars_per_hour
+FROM 
+    hours h
+CROSS JOIN 
+    (SELECT DISTINCT buffer_zone_id, buffer_zone_name 
+     FROM buffer_zone 
+     WHERE buffer_zone_id IN (1, 3)
+    ) bz
+LEFT JOIN 
+    agg a
+    ON a.dt = h.dt
+    AND a.buffer_zone_name = bz.buffer_zone_name
+ORDER BY 
+    bz.buffer_zone_name, 
+    h.dt;
