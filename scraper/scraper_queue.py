@@ -1,4 +1,4 @@
-from functions import fetch_data_from_api, insert_data_into_db, convert_date
+from scraper_functions import fetch_data_from_api, insert_data_into_db, convert_date
 
 
 def main():

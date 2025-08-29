@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from functions import get_database_connection, create_visual
+from visualizer_functions import get_database_connection, create_visual
 from dotenv import load_dotenv
 import os
 
@@ -45,7 +45,7 @@ for interval, query in intervals.items():
     plt.grid()
     plt.tight_layout()
     
-    plt.savefig(f'{os.getenv("WORKING_DIR_PATH")}/www/queue_length_visual_{interval.replace(" ", "_")}.png')
+    plt.savefig(f'/visualizer/www/queue_length_visual_{interval.replace(" ", "_")}.png')
     plt.close()
 
 conn.close()

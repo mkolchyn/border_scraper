@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+# This makes each cron job source the container env that was exported in start-cron.sh
+BASH_ENV=/visualizer/container.env
+
+# Run visualizer scripts
+${VISUALIZER_INTERVAL} root /usr/local/bin/python /visualizer/visualizer.py
+${VISUALIZER_INTERVAL} root /usr/local/bin/python /visualizer/visualizer_stats.py
