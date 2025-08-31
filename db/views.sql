@@ -1,21 +1,12 @@
-CREATE OR REPLACE VIEW public.vsl_lt_1_mnth
+CREATE OR REPLACE VIEW public.vsl_lt_3_hrs
 AS SELECT qla.insert_dt,
     bz.buffer_zone_name,
     qla.count_car
-  FROM queue_length_all qla
+   FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
-  ORDER BY qla.insert_dt DESC;
-  
-CREATE OR REPLACE VIEW public.vsl_lt_1_wk
-AS SELECT qla.insert_dt,
-    bz.buffer_zone_name,
-    qla.count_car
-  FROM queue_length_all qla
-     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '6 days'::interval)
-  ORDER BY qla.insert_dt DESC;
-  
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
+  ORDER BY qla.insert_dt;
+
 CREATE OR REPLACE VIEW public.vsl_lt_24_hrs
 AS SELECT qla.insert_dt,
     bz.buffer_zone_name,
@@ -25,14 +16,98 @@ AS SELECT qla.insert_dt,
   WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '24:00:00'::interval)
   ORDER BY qla.insert_dt;
 
-CREATE OR REPLACE VIEW public.vsl_lt_3_hrs
+CREATE OR REPLACE VIEW public.vsl_lt_1_wk
 AS SELECT qla.insert_dt,
     bz.buffer_zone_name,
     qla.count_car
    FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND date_trunc('day'::text, qla.insert_dt) >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '7 days'::interval)
   ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_lt_1_mnth
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+  FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Kamenny Log'::character varying::text, 'Benyakoni'::character varying::text])) AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
+  ORDER BY qla.insert_dt DESC;
+
+
+CREATE OR REPLACE VIEW public.vsl_lv_3_hrs
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Grigorovschina') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_lv_24_hrs
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Grigorovschina') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '24:00:00'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_lv_1_wk
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Grigorovschina') AND date_trunc('day'::text, qla.insert_dt) >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '7 days'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_lv_1_mnth
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+  FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Grigorovschina') AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
+  ORDER BY qla.insert_dt DESC;
+
+
+CREATE OR REPLACE VIEW public.vsl_pl_3_hrs
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_pl_24_hrs
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '24:00:00'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_pl_1_wk
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+   FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('day'::text, qla.insert_dt) >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '7 days'::interval)
+  ORDER BY qla.insert_dt;
+
+CREATE OR REPLACE VIEW public.vsl_pl_1_mnth
+AS SELECT qla.insert_dt,
+    bz.buffer_zone_name,
+    qla.count_car
+  FROM queue_length_all qla
+     JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
+  ORDER BY qla.insert_dt DESC;
+
 
 CREATE OR REPLACE VIEW vsl_all_car_origin_ratio AS 
 WITH car_origin_by_country AS (
