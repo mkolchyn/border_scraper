@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from visualizer_functions import get_database_connection, create_visual
+from visualizer_functions import create_visual
 from dotenv import load_dotenv
 import os
 
