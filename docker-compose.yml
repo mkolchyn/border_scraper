@@ -4,6 +4,7 @@ services:
     container_name: border_scraper_db
     restart: always
     environment:
+      TZ: Europe/Vilnius
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -12,8 +13,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
 
   app:
     build:
@@ -22,9 +21,6 @@ services:
     restart: always
     env_file:
       - .env
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - db
 
@@ -37,8 +33,6 @@ services:
       - .env
     volumes:
       - ./www:/visualizer/www
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - db
 
@@ -50,8 +44,6 @@ services:
       - "0.0.0.0:80:80"
     volumes:
       - ./www:/usr/share/nginx/html:ro
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - visualizer
 

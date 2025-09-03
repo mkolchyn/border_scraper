@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import psycopg2
+import datetime
+from zoneinfo import ZoneInfo
 from sqlalchemy import create_engine
 
 # Load environment variables from .env file
@@ -24,7 +25,7 @@ def create_visual (intervals, cln_index, cln_columns, cln_values):
 
     for country, interval, query in intervals:
         df = pd.read_sql_query(query, conn)
-        df[cln_index] = pd.to_datetime(df[cln_index])
+        df[cln_index] = pd.to_datetime(df[cln_index], utc=True).dt.tz_convert(ZoneInfo(os.getenv('TZ')))
         pivot_df = df.pivot(index=cln_index, columns=cln_columns, values=cln_values)
         pivot_df = pivot_df.sort_index()
 
@@ -45,13 +46,17 @@ def create_visual (intervals, cln_index, cln_columns, cln_values):
         plt.title(f'Queue Length in {country} Over Time by Buffer Zone - {interval}', fontsize=30)
         plt.xticks(rotation=45, fontsize=20)
         plt.yticks(fontsize=20)
+
+        # Add legend including creation date
+        creation_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        plt.plot([], [], ' ', label=f"Created on: {creation_date}")  # invisible dummy plot
         plt.legend(fontsize=20, loc="upper right")
+
         plt.grid()
         plt.tight_layout()
 
-        # Include country and interval in filename
+        # Save figure
         plt.savefig(f'/visualizer/www/{country}/queue_length_visual_{interval.replace(" ", "_")}.png')
         plt.close()
-
 
     conn.dispose()
