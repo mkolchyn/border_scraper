@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy scripts and crontab template
 COPY visualizer.py visualizer_stats.py visualizer_functions.py crontab.template start-cron.sh ./
+RUN mkdir log
 
 # Install cron and gettext (for envsubst)
 RUN apt-get update && apt-get install -y cron gettext

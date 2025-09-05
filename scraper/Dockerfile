@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy scripts and crontab template
 COPY scraper_car.py scraper_queue.py scraper_functions.py crontab.template start-cron.sh ./
+RUN mkdir log
 
 # Install cron and gettext (for envsubst)
 RUN apt-get update && apt-get install -y cron gettext
