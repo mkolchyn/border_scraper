@@ -155,3 +155,24 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_car_queue_length_archive(
+    p_month DATE,
+    p_buffer_zone_ids INT[]
+)
+RETURNS TABLE (
+    insert_dt TIMESTAMP,
+    buffer_zone_name varchar(50),
+    count_car int4
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT qla.insert_dt,
+           bz.buffer_zone_name,
+           qla.count_car
+    FROM queue_length_all qla
+    JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
+    WHERE qla.buffer_zone_id = ANY(p_buffer_zone_ids)
+      AND DATE_TRUNC('month', qla.insert_dt) = p_month;
+END;
+$$ LANGUAGE plpgsql;
