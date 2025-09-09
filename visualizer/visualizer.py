@@ -1,12 +1,5 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 from visualizer_functions import create_visual
-from dotenv import load_dotenv
-import os
 
-# Load environment variables from .env file
-load_dotenv()
 
 intervals = [
     ("lithuania", "3 hours", "select * from vsl_lt_3_hrs;"),
