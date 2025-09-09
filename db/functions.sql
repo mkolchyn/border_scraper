@@ -95,3 +95,63 @@ BEGIN
     FROM ratios r;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION calculate_queue_speed()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_car int;
+    time_diff_val numeric(10,2);
+    queue_speed_val numeric(10,2);
+    registration_bucket timestamp;
+    insert_bucket timestamp;
+BEGIN
+    -- Compute the registration bucket (nearest 5-min)
+    registration_bucket := DATE_TRUNC('minute', NEW.registration_date)
+                           - INTERVAL '1 minute' * (EXTRACT(MINUTE FROM NEW.registration_date)::int % 5);
+
+    -- Get count_car from queue_length_all for this buffer_zone and time bucket
+    SELECT qla.count_car
+    INTO count_car
+    FROM queue_length_all qla
+    WHERE qla.buffer_zone_id = NEW.buffer_zone_id
+      AND DATE_TRUNC('minute', qla.insert_dt AT TIME ZONE 'Europe/Minsk') 
+          - INTERVAL '1 minute' * (EXTRACT(MINUTE FROM qla.insert_dt AT TIME ZONE 'Europe/Minsk')::int % 5) = registration_bucket
+    LIMIT 1;
+
+	-- Calculate time_diff in hours (can handle multiple days)
+	IF NEW.changed_date IS NOT NULL THEN
+	    -- Extract interval between changed_date and registration_date in hours
+	    time_diff_val := ROUND(EXTRACT(EPOCH FROM (NEW.changed_date - NEW.registration_date)) / 3600.0, 2);
+	ELSE
+	    time_diff_val := NULL;
+	END IF;
+
+    -- Calculate queue_speed
+    IF time_diff_val >= 1 THEN
+        queue_speed_val := ROUND(count_car::numeric / time_diff_val, 2);
+    ELSE
+        queue_speed_val := NULL;
+    END IF;
+
+    -- Insert into queue_speed table
+    INSERT INTO queue_speed(
+        buffer_zone_id,
+        regnum,
+        registration_date,
+        changed_date,
+        time_diff,
+		count_car,
+        queue_speed
+    ) VALUES (
+        NEW.buffer_zone_id,
+        NEW.regnum,
+        NEW.registration_date,
+        NEW.changed_date,
+        time_diff_val,
+		count_car,
+        queue_speed_val
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
