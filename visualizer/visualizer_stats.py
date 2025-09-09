@@ -3,7 +3,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from visualizer_functions import get_database_connection
 from dotenv import load_dotenv
-import os
 
 # Load environment variables from .env file
 load_dotenv()
@@ -48,4 +47,4 @@ for interval, query in intervals.items():
     plt.savefig(f'/visualizer/www/sum/queue_length_visual_{interval.replace(" ", "_")}.png')
     plt.close()
 
-conn.close()
+conn.dispose()
