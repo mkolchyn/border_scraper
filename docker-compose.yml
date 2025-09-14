@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16
+    container_name: border_scraper_db
+    restart: always
+    environment:
+      TZ: Europe/Vilnius
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "0.0.0.0:${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+
+  app:
+    build:
+      context: ./scraper
+    container_name: border_scraper_app
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  visualizer:
+    build:
+      context: ./visualizer
+    container_name: border_scraper_visualizer
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./www:/visualizer/www
+    depends_on:
+      - db
+
+  web:
+    image: nginx:alpine
+    container_name: border_scraper_web
+    restart: always
+    ports:
+      - "0.0.0.0:80:80"
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
+    depends_on:
+      - visualizer
+
+volumes:
+  postgres_data:

@@ -47,3 +47,16 @@ CREATE TABLE public.car_live_queue (
     insert_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
     PRIMARY KEY (regnum, registration_date)
 );
+
+CREATE TABLE public.queue_speed( 
+    row_id serial4 NOT NULL,
+    buffer_zone_id int4 NOT NULL,
+    regnum varchar(10) NOT NULL,
+    registration_date timestamp NOT NULL,
+    changed_date timestamp NULL,
+    time_diff numeric(10,2),
+    count_car int4,
+    queue_speed numeric(10,2),
+    insert_dt timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+    CONSTRAINT queue_speed_pkey PRIMARY KEY (regnum, registration_date)
+);
