@@ -5,8 +5,8 @@ import subprocess
 from datetime import datetime
 
 # Get intervals from environment
-VISUALIZER_INTERVAL = int(os.getenv("VISUALIZER_INTERVAL", 300))  # default 5 min
-VISUALIZER_STATS_INTERVAL = int(os.getenv("VISUALIZER_STATS_INTERVAL", 600))  # default 10 min
+SCRAPER_CAR_INTERVAL = int(os.getenv("SCRAPER_CAR_INTERVAL", 60))  # default 1 min
+SCRAPER_QUEUE_INTERVAL = int(os.getenv("SCRAPER_QUEUE_INTERVAL", 300))  # default 5 min
 
 LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -27,8 +27,8 @@ def run_script(script_name, interval):
         time.sleep(interval)
 
 if __name__ == "__main__":
-    t1 = threading.Thread(target=run_script, args=("visualizer_stats", VISUALIZER_STATS_INTERVAL), daemon=True)
-    t2 = threading.Thread(target=run_script, args=("visualizer", VISUALIZER_INTERVAL), daemon=True)
+    t1 = threading.Thread(target=run_script, args=("scraper_car", SCRAPER_CAR_INTERVAL), daemon=True)
+    t2 = threading.Thread(target=run_script, args=("scraper_queue", SCRAPER_QUEUE_INTERVAL), daemon=True)
 
     t1.start()
     t2.start()
