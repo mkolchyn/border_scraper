@@ -1,7 +1,0 @@
-SHELL=/bin/bash
-# This makes each cron job source the container env that was exported in start-cron.sh
-BASH_ENV=/app/container.env
-
-# Run scraper.py
-${SCRAPER_CAR_INTERVAL} root /usr/local/bin/python /app/scraper_car.py >> 1>/dev/null 2>> /app/log/scraper_car.err.log
-${SCRAPER_QUEUE_INTERVAL} root /usr/local/bin/python /app/scraper_queue.py >> 1>/dev/null 2>> /app/log/scraper_queue.err.log
