@@ -60,3 +60,13 @@ CREATE TABLE public.queue_speed(
     insert_dt timestamp DEFAULT CURRENT_TIMESTAMP NULL,
     CONSTRAINT queue_speed_pkey PRIMARY KEY (regnum, registration_date)
 );
+
+INSERT INTO buffer_zone (buffer_zone_id, buffer_zone_name)
+VALUES
+	(1, 'Benyakoni'),
+	(2, 'Brest BTS ("Varshavskiy Most")'),
+	(3, 'Kamenny Log'),
+	(4, 'Grigorovschina'),
+    (5, 'Berestovica'),
+    (6, 'Bruzgi')
+;

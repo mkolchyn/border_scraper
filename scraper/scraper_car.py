@@ -20,7 +20,9 @@ def main():
         2: "a9173a85-3fc0-424c-84f0-defa632481e4",
         3: "b60677d4-8a00-4f93-a781-e129e1692a03",
         4: "ffe81c11-00d6-11e8-a967-b0dd44bde851",
-        }
+        5: "7e46a2d1-ab2f-11ec-bafb-ac1f6bf889c1",
+        6: "3b797d4d-706a-440f-a1a4-826c191e1e36"
+        }   
 
         for buffer_zone_id, checkpointID in buffer_zones.items():
             url = f"https://belarusborder.by/info/monitoring-new?token=test&checkpointId={checkpointID}"

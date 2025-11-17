@@ -22,7 +22,9 @@ def main():
             "53d94097-2b34-11ec-8467-ac1f6bf889c0": 1,
             "a9173a85-3fc0-424c-84f0-defa632481e4": 2,
             "b60677d4-8a00-4f93-a781-e129e1692a03": 3,
-            "ffe81c11-00d6-11e8-a967-b0dd44bde851": 4
+            "ffe81c11-00d6-11e8-a967-b0dd44bde851": 4,
+            "7e46a2d1-ab2f-11ec-bafb-ac1f6bf889c1": 5,
+            "3b797d4d-706a-440f-a1a4-826c191e1e36": 6
         }
 
         data = fetch_data_from_api(url)
@@ -52,6 +54,8 @@ def main():
             2: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=a9173a85-3fc0-424c-84f0-defa632481e4",
             3: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=b60677d4-8a00-4f93-a781-e129e1692a03",
             4: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=ffe81c11-00d6-11e8-a967-b0dd44bde851",
+            5: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=7e46a2d1-ab2f-11ec-bafb-ac1f6bf889c1",
+            6: "https://belarusborder.by/info/monitoring/statistics?token=test&checkpointId=3b797d4d-706a-440f-a1a4-826c191e1e36"
         }
 
         for buffer_zone_id, url in scope.items():
