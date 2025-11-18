@@ -78,7 +78,7 @@ AS SELECT qla.insert_dt,
     qla.count_car
    FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Brest BTS ("Varshavskiy Most")'::character varying::text, 'Berestovica'::character varying::text, 'Bruzgi'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '03:00:00'::interval)
   ORDER BY qla.insert_dt;
 
 CREATE OR REPLACE VIEW public.vsl_pl_24_hrs
@@ -87,7 +87,7 @@ AS SELECT qla.insert_dt,
     qla.count_car
    FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '24:00:00'::interval)
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Brest BTS ("Varshavskiy Most")'::character varying::text, 'Berestovica'::character varying::text, 'Bruzgi'::character varying::text])) AND date_trunc('hour'::text, qla.insert_dt) >= (date_trunc('hour'::text, CURRENT_TIMESTAMP) - '24:00:00'::interval)
   ORDER BY qla.insert_dt;
 
 CREATE OR REPLACE VIEW public.vsl_pl_1_wk
@@ -96,7 +96,7 @@ AS SELECT qla.insert_dt,
     qla.count_car
    FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND date_trunc('day'::text, qla.insert_dt) >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '7 days'::interval)
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Brest BTS ("Varshavskiy Most")'::character varying::text, 'Berestovica'::character varying::text, 'Bruzgi'::character varying::text])) AND date_trunc('day'::text, qla.insert_dt) >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '7 days'::interval)
   ORDER BY qla.insert_dt;
 
 CREATE OR REPLACE VIEW public.vsl_pl_1_mnth
@@ -105,7 +105,7 @@ AS SELECT qla.insert_dt,
     qla.count_car
   FROM queue_length_all qla
      JOIN buffer_zone bz ON qla.buffer_zone_id = bz.buffer_zone_id
-  WHERE (bz.buffer_zone_name::text = 'Brest BTS ("Varshavskiy Most")') AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
+  WHERE (bz.buffer_zone_name::text = ANY (ARRAY['Brest BTS ("Varshavskiy Most")'::character varying::text, 'Berestovica'::character varying::text, 'Bruzgi'::character varying::text])) AND qla.insert_dt >= (date_trunc('day'::text, CURRENT_TIMESTAMP) - '30 days'::interval)
   ORDER BY qla.insert_dt DESC;
 
 
